@@ -1,29 +1,37 @@
-(ns euler21
-  (:require [clojure.contrib.math]))
+(defn is-factor [f n]
+  (if (= 0 (rem n f))
+    f
+    0))
 
-(defn is-divisor
-  [n m]
-  (if
-    (= 0 (rem n m))
-    m))
 
-(defn divisors
-  [n]
+(defn factors [n]
   (filter
-    (fn [el] (not= el nil))
-    (map
-      (fn [m] (is-divisor n m))
-      (range 1 (+ 1 (clojure.contrib.math/sqrt n))))))
-
-(defn all-divisors
-  [n]
-  (let
-    [left (divisors n)
-     right (map (fn [m] (/ n m)) left)]
-    (clojure.set/difference (clojure.set/union (set left) (set right)) #{n})))
+    (fn [n] (not (= n 0)))
+    (map (fn [f] (is-factor f n)) (range 1 n))))
 
 
+(defn d [n]
+  (apply + (factors n)))
 
-(println (map (fn [n] {(apply + (all-divisors n)) n}) (range 10 20)))
 
-;(println (apply + (all-divisors 100)))
+(defn pairs [ns]
+  (map (fn [n] [n (d n)]) ns))
+
+
+(defn main2 []
+  (let [the-pairs (pairs (range 1 10001))]
+    (filter
+      (fn [i] (not (= i nil)))
+      (map (fn [e] (some #{[(second e) (first e)]} the-pairs)) the-pairs))))
+
+
+(defn summer []
+  (let [the-pairs (main2)]
+    (apply + (map
+      first
+      (filter
+        (fn [pair] (not (= (first pair) (second pair))))
+        the-pairs)))))
+
+
+(println (summer))
